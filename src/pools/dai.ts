@@ -24,16 +24,11 @@ const legacyContractAddressesDai = {
 // For every contractName require the ABI
 const legacyAbisDai = {};
 
-for (const version of Object.keys(legacyContractAddressesDai))
-  legacyAbisDai[version] = {};
+for (const version of Object.keys(legacyContractAddressesDai)) legacyAbisDai[version] = {};
 
 for (const version of Object.keys(legacyAbisDai))
   for (const contractName of Object.keys(legacyContractAddressesDai[version]))
-    legacyAbisDai[version][contractName] = require("./dai/abi/legacy/" +
-      version +
-      "/" +
-      contractName +
-      ".json");
+    legacyAbisDai[version][contractName] = require("./dai/abi/legacy/" + version + "/" + contractName + ".json");
 
 export default class DaiPool extends StablePools {
   API_BASE_URL = "https://api.rari.capital/pools/dai/";
@@ -52,26 +47,24 @@ export default class DaiPool extends StablePools {
       this.contracts[contractName] = new ethers.Contract(
         contractAddressesDai[contractName],
         DaiPool.CONTRACT_ABIS[contractName],
-        this.provider
+        this.provider,
       );
 
     this.legacyContracts = {};
     for (const version of Object.keys(legacyContractAddressesDai)) {
       if (!this.legacyContracts[version]) this.legacyContracts[version] = {};
 
-      for (const contractName of Object.keys(
-        legacyContractAddressesDai[version]
-      )) {
+      for (const contractName of Object.keys(legacyContractAddressesDai[version])) {
         this.legacyContracts[version][contractName] = new ethers.Contract(
           legacyContractAddressesDai[version][contractName],
           legacyAbisDai[version][contractName],
-          this.provider
+          this.provider,
         );
       }
     }
 
     this.allocations.POOLS = (function () {
-      var pools = ["dYdX", "Compound", "Aave", "mStable"];
+      let pools = ["dYdX", "Compound", "Aave", "mStable"];
       pools[100] = "Fuse6";
       pools[101] = "Fuse7";
       pools[102] = "Fuse18";

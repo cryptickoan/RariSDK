@@ -21,7 +21,7 @@ import StablePool from "./pools/stable";
 import DaiPool from "./pools/dai";
 
 // ERC20ABI
-import erc20Abi from "./abi/ERC20.json"
+import erc20Abi from "./abi/ERC20.json";
 export default class Rari {
   provider;
   cache;
@@ -39,15 +39,13 @@ export default class Rari {
       this.internalTokens[currencyCode].contract = new ethers.Contract(
         this.internalTokens[currencyCode].address,
         erc20Abi,
-        this.provider
+        this.provider,
       );
 
-    var self = this;
+    let self = this;
     this.price = async function () {
       try {
-        return await axios.get(
-          "https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum"
-        );
+        return await axios.get("https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum");
       } catch (e) {
         console.log(e);
       }
@@ -57,14 +55,9 @@ export default class Rari {
       return await self.cache.getOrUpdate("ethUSDPrice", async function () {
         try {
           const usdPrice = (
-            await axios.get(
-              "https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum"
-            )
+            await axios.get("https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum")
           ).data.ethereum.usd;
-          const usdPriceBN = ethers.utils.parseUnits(
-            usdPrice.toString(),
-            "ether"
-          );
+          const usdPriceBN = ethers.utils.parseUnits(usdPrice.toString(), "ether");
           return usdPriceBN;
         } catch (error) {
           throw new Error("Error retrieving data from Coingecko API: " + error);
@@ -73,27 +66,14 @@ export default class Rari {
     };
 
     this.getAllTokens = async function (cacheTimeout = 86400) {
-      self.cache._raw["allTokens"].timeout =
-        typeof cacheTimeout === "undefined" ? 86400 : cacheTimeout;
+      self.cache._raw["allTokens"].timeout = typeof cacheTimeout === "undefined" ? 86400 : cacheTimeout;
       return await self.cache.getOrUpdate("allTokens", async function () {
-        var allTokens = Object.assign({}, self.internalTokens);
-        var data = (await axios.get("https://api.0x.org/swap/v0/tokens")).data;
+        let allTokens = Object.assign({}, self.internalTokens);
+        let data = (await axios.get("https://api.0x.org/swap/v0/tokens")).data;
         data.records.sort((a, b) => (a.symbol > b.symbol ? 1 : -1));
 
         for (const token of data.records)
-          if (
-            [
-              "DAI",
-              "USDC",
-              "USDT",
-              "TUSD",
-              "BUSD",
-              "bUSD",
-              "sUSD",
-              "SUSD",
-              "mUSD",
-            ].indexOf(token.symbol) < 0
-          ) {
+          if (["DAI", "USDC", "USDT", "TUSD", "BUSD", "bUSD", "sUSD", "SUSD", "mUSD"].indexOf(token.symbol) < 0) {
             token.contract = new ethers.Contract(token.address, erc20Abi);
             allTokens[token.symbol] = token;
           }
@@ -162,7 +142,7 @@ export default class Rari {
           Fuse18: subpools["Fuse18"],
           Fuse6: subpools["Fuse6"],
         },
-        this.getAllTokens
+        this.getAllTokens,
       ),
       dai: new DaiPool(
         this.provider,
@@ -175,7 +155,7 @@ export default class Rari {
           Fuse7: subpools["Fuse7"],
           Fuse18: subpools["Fuse18"],
         },
-        this.getAllTokens
+        this.getAllTokens,
       ),
     };
   }
