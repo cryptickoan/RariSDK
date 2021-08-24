@@ -1,8 +1,8 @@
-var { ethers: ethers} = require('ethers')
-var Caches = require('../cache.ts')
-var axios = require('axios')
+import ethers from 'ethers'
+import Caches from 'cache'
+import axios from 'axios'
 
-var erc20Abi = require('../abi/ERC20.json')
+import erc20Abi from '../abi/ERC20.json'
 
 // Contract addresses
 const contractAddressesStable = {
@@ -57,7 +57,7 @@ for (const version of Object.keys(legacyAbis))
     for (const contractName of Object.keys(legacyContractAddresses[version]))
     legacyAbis[version][contractName] = require("./stable/abi/legacy/" + version + "/" + contractName + ".json") 
 
-module.exports = class StablePool {
+export default class StablePool {
     API_BASE_URL = "https://api.rari.capital/pools/stable/";
     POOL_NAME = "Rari Stable Pool";
     POOL_TOKEN_SYMBOL = "RSPT";

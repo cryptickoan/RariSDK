@@ -1,6 +1,6 @@
-var ethers = require('ethers')
+import ethers from "ethers";
 
-module.exports = class YVault {
+export default class YVault {
     provider
 
     constructor(provider) {

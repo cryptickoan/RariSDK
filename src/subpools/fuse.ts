@@ -1,9 +1,8 @@
-var ethers = require('ethers')
-var Caches = require('../cache.ts')
+import Caches from 'cache'
+import { ethers } from "ethers";
+import cErc20DelegateAbi from './fuse/abi/CErc20Delegate.json'
 
-var cErc20DelegateAbi = require('./fuse/abi/CErc20Delegate.json')
-
-module.exports = class FuseSubpool {
+export default class FuseSubpool {
     provider
     cTokens
     cache

@@ -1,4 +1,4 @@
-module.exports = class Cache {
+export default class Cache {
     _raw = {}
 
     constructor(timeouts) {

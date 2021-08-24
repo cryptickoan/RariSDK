@@ -1,6 +1,12 @@
-var Caches = require('../cache.ts') 
+import Caches from 'cache'
 
-module.exports = class AaveSubpool {
+// Axios
+import axios from "axios";
+
+// Ethers
+import { ethers } from "ethers";
+
+export default class AaveSubpool {
     ethers
     cache
 

@@ -1,9 +1,8 @@
-var ethers = require('ethers')
-var axios = require('axios')
+import Caches from 'cache'
+import axios from "axios";
+import { ethers } from "ethers";
 
-var Caches = require('../cache.ts')
-
-module.exports = class DydxSubpool {
+export default class DydxSubpool {
     provider
     cache
 

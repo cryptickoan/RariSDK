@@ -1,5 +1,5 @@
-var ethers = require('ethers')
-var Caches = require('../cache.ts')
+import ethers from 'ethers'
+import Caches from 'cache'
 
 var externalContractAddressesAlpha = {
     Bank: "0x67B66C99D3Eb37Fa76Aa3Ed1ff33E8e39F0b9c7A",
@@ -11,7 +11,7 @@ for (const contractName of Object.keys(externalContractAddressesAlpha)) {
     externalAbisAlpha[contractName] = require('./alpha/abi/' + contractName + '.json')
 }
 
-module.exports = class AlphaSubpool {
+export default class AlphaSubpool {
     provider
     cache
     externalContracts

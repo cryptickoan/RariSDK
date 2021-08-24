@@ -1,8 +1,8 @@
-var ethers = require('ethers')
-var axios = require('axios')
-var Caches = require('../cache.ts')
+import Caches from 'cache'
+import axios from "axios";
+import { ethers } from "ethers";
 
-module.exports = class CompoundSubpool {
+export default class CompoundSubpool {
     provider
     cache
 
