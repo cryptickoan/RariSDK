@@ -1,6 +1,6 @@
 import Caches from "../cache";
 import axios from "axios";
-import { ethers } from "ethers";
+import { BigNumber } from "ethers";
 
 export default class AaveSubpool {
   ethers;
@@ -43,9 +43,9 @@ export default class AaveSubpool {
         )
           continue;
 
-        apyBNs[data.data.reserves[i].symbol == "SUSD" ? "sUSD" : data.data.reserves[i].symbol] = ethers.BigNumber.from(
+        apyBNs[data.data.reserves[i].symbol == "SUSD" ? "sUSD" : data.data.reserves[i].symbol] = BigNumber.from(
           data.date.reserves[i].liquidityRate,
-        ).div(ethers.BigNumber.from(1e9));
+        ).div(BigNumber.from(1e9));
       }
 
       return apyBNs;

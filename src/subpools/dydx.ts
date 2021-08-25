@@ -1,6 +1,6 @@
 import Caches from "../cache";
 import axios from "axios";
-import { ethers } from "ethers";
+import { utils } from "ethers";
 
 export default class DydxSubpool {
   provider;
@@ -20,7 +20,7 @@ export default class DydxSubpool {
       let apyBNs = {};
 
       for (let i = 0; i < data.markets.length; i++) {
-        apyBNs[data.markets[i].symbol] = ethers.utils.parseUnits(data.markets[i].totalSupplyAPR, 77);
+        apyBNs[data.markets[i].symbol] = utils.parseUnits(data.markets[i].totalSupplyAPR, 77);
       }
       return apyBNs;
     });

@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { constants } from "ethers";
 
 export default class YVault {
   provider;
@@ -9,10 +9,10 @@ export default class YVault {
 
   getCurrencyApys() {
     return {
-      DAI: ethers.constants.Zero,
-      USDC: ethers.constants.Zero,
-      USDT: ethers.constants.Zero,
-      TUSD: ethers.constants.Zero,
+      DAI: constants.Zero,
+      USDC: constants.Zero,
+      USDT: constants.Zero,
+      TUSD: constants.Zero,
     };
   }
 }

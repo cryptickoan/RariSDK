@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // Ethers
-import { ethers } from "ethers";
+import { Contract, constants, utils, BigNumber } from "ethers";
 
 import Caches from "../cache";
 
@@ -37,7 +37,7 @@ export default class mStableSubpool {
     this.externalContracts = {};
 
     for (const contractName of Object.keys(externalContractAddressesMStable)) {
-      this.externalContracts[contractName] = new ethers.Contract(
+      this.externalContracts[contractName] = new Contract(
         externalContractAddressesMStable[contractName],
         externalAbisMStable[contractName],
       );
@@ -56,9 +56,9 @@ export default class mStableSubpool {
     if (!data || !data.data)
       return console.error("Failed to decode exchange rates from The Graph when calculating mStable 24-hour APY");
 
-    this.cache.update("mUsdSwapFee", ethers.BigNumber.from(data.data.masset.feeRate));
+    this.cache.update("mUsdSwapFee", BigNumber.from(data.data.masset.feeRate));
 
-    let apy = ethers.utils.parseUnits(data.data.masset.savingsContractsV2[0].dailyAPY, 16);
+    let apy = utils.parseUnits(data.data.masset.savingsContractsV2[0].dailyAPY, 16);
 
     if (includeIMUsdVaultApy)
       apy = apy.add(
@@ -88,10 +88,10 @@ export default class mStableSubpool {
 
   async getIMUsdVaultWeeklyRoi(totalStakingRewards, stakingTokenPrice) {
     // Get Total Staked by our account
-    const contract = new ethers.Contract("0x30647a72dc82d7fbb1123ea74716ab8a317eac19", erc20Abi, this.provider);
+    const contract = new Contract("0x30647a72dc82d7fbb1123ea74716ab8a317eac19", erc20Abi, this.provider);
     const totalStaked =
       (await contract.balanceOf("0x78befca7de27d07dc6e71da295cc2946681a6c7b")) /
-      ethers.constants.WeiPerEther.toNumber();
+      constants.WeiPerEther.toNumber();
 
     // https://github.com/mstable/mStable-app/blob/56055318f23b43479455cdf0a9521dfec493b01c/src/hooks/useVaultWeeklyROI.ts#L43
     const mtaPerWeekInUsd = totalStakingRewards * (await this.getMtaUsdPrice());
@@ -101,8 +101,8 @@ export default class mStableSubpool {
 
   async getIMUsdVaultApy(totalStakingRewards, stakingTokenPrice) {
     const weeklyROI = await this.getIMUsdVaultWeeklyRoi(totalStakingRewards, stakingTokenPrice);
-    const apyBN = ethers.utils.parseUnits(
-      ethers.utils.formatUnits((((weeklyROI + 1) ** 52 - 1) * 1e18).toFixed(0), 18),
+    const apyBN = utils.parseUnits(
+      utils.formatUnits((((weeklyROI + 1) ** 52 - 1) * 1e18).toFixed(0), 18),
       18,
     );
 

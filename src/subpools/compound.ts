@@ -1,6 +1,6 @@
 import Caches from "../cache";
 import axios from "axios";
-import { ethers } from "ethers";
+import { utils } from "ethers";
 
 export default class CompoundSubpool {
   provider;
@@ -20,8 +20,8 @@ export default class CompoundSubpool {
       let apyBNs = {};
 
       for (let i = 0; i < data.cToken.length; i++) {
-        const supplyApy = ethers.utils.parseUnits(data.cToken[i].supply_rate.value, 28);
-        const compApy = ethers.utils.parseUnits(
+        const supplyApy = utils.parseUnits(data.cToken[i].supply_rate.value, 28);
+        const compApy = utils.parseUnits(
           data.cToken[i].comp_supply_apy.value,
           data.cToken[i].comp_supply_apy.value.length - 1,
         );

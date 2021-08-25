@@ -22,7 +22,6 @@ import DaiPool from "./pools/dai";
 
 // ERC20ABI
 import erc20Abi from "./abi/ERC20.json";
-
 export default class Rari {
   provider;
   cache;
