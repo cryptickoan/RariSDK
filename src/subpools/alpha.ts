@@ -28,8 +28,6 @@ export default class AlphaSubpool {
 
     this.externalContracts = {};
     for (const contractName of Object.keys(externalContractAddressesAlpha)) {
-      console.log({ Contract });
-
       this.externalContracts[contractName] = new Contract(
         externalContractAddressesAlpha[contractName],
         externalAbisAlpha[contractName],

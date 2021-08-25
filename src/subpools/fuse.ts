@@ -18,7 +18,6 @@ export default class FuseSubpool {
   }
 
   async getCurrencyApy(cTokenAddress) {
-    console.log({ Contract, BigNumber });
     const cToken = new Contract(cTokenAddress, cErc20DelegateAbi, this.provider);
     const supplyRatePerBlock = await cToken.supplyRatePerBlock();
     return BigNumber.from(((Math.pow((supplyRatePerBlock / 1e18) * (4 * 60 * 24) + 1, 365) - 1) * 1e18).toFixed(0));

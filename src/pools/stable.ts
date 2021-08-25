@@ -118,8 +118,6 @@ const legacyAbis = {
   },
 };
 
-console.log({ legacyAbis, abisStable });
-
 export default class StablePool {
   API_BASE_URL = "https://api.rari.capital/pools/stable/";
   POOL_NAME = "Rari Stable Pool";

@@ -12,7 +12,8 @@
     "preversion": "npm run lint",
     "test": "echo \"Error: no test specified\" && exit 1",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "run-example": "cd ./examples/next && npm run dev"
   },
   "author": "",
   "license": "ISC",
