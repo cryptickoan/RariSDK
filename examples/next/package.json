@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "analyze": "ANALYZE=true npm run build",
-    "dev": "npm run buildPackage && next dev",
+    "dev": "npm run buildPackage && next dev -p 3030",
     "build": "npm run buildPackage && next build",
-    "start": "npm run buildPackage && next start",
+    "start": "npm run buildPackage && next start -p 3030",
     "lint": "next lint",
     "buildPackage": "cd ../.. && npm run build"
   },

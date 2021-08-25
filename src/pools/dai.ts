@@ -27,11 +27,11 @@ const legacyContractAddressesDai = {
 
 // For every contractName require the ABI
 const legacyAbisDai = {
-    "v1.0.0": {
-      RariFundController: RariFundControllerv100,
-      RariFundProxy: RariFundProxyABIv100,
-    },
-  };
+  "v1.0.0": {
+    RariFundController: RariFundControllerv100,
+    RariFundProxy: RariFundProxyABIv100,
+  },
+};
 export default class DaiPool extends StablePools {
   API_BASE_URL = "https://api.rari.capital/pools/dai/";
   POOL_NAME = "Rari DAI Pool";

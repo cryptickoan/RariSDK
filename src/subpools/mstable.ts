@@ -8,9 +8,8 @@ import Caches from "../cache";
 
 // ABIs
 import erc20Abi from "../abi/ERC20.json";
-import MAsset from './mstable/abi/Masset.json';
-import MassetValidationHelper from './mstable/abi/MassetValidationHelper.json';
-
+import MAsset from "./mstable/abi/Masset.json";
+import MassetValidationHelper from "./mstable/abi/MassetValidationHelper.json";
 
 const externalContractAddressesMStable = {
   Masset: "0xe2f2a5c287993345a840db3b0845fbc70f5935a5",
@@ -18,8 +17,8 @@ const externalContractAddressesMStable = {
 };
 
 const externalAbisMStable = {
-    "Masset": MAsset,
-    "MassetValidationHelper": MassetValidationHelper
+  Masset: MAsset,
+  MassetValidationHelper: MassetValidationHelper,
 };
 
 export default class mStableSubpool {
@@ -90,8 +89,7 @@ export default class mStableSubpool {
     // Get Total Staked by our account
     const contract = new Contract("0x30647a72dc82d7fbb1123ea74716ab8a317eac19", erc20Abi, this.provider);
     const totalStaked =
-      (await contract.balanceOf("0x78befca7de27d07dc6e71da295cc2946681a6c7b")) /
-      constants.WeiPerEther.toNumber();
+      (await contract.balanceOf("0x78befca7de27d07dc6e71da295cc2946681a6c7b")) / constants.WeiPerEther.toNumber();
 
     // https://github.com/mstable/mStable-app/blob/56055318f23b43479455cdf0a9521dfec493b01c/src/hooks/useVaultWeeklyROI.ts#L43
     const mtaPerWeekInUsd = totalStakingRewards * (await this.getMtaUsdPrice());
@@ -101,10 +99,7 @@ export default class mStableSubpool {
 
   async getIMUsdVaultApy(totalStakingRewards, stakingTokenPrice) {
     const weeklyROI = await this.getIMUsdVaultWeeklyRoi(totalStakingRewards, stakingTokenPrice);
-    const apyBN = utils.parseUnits(
-      utils.formatUnits((((weeklyROI + 1) ** 52 - 1) * 1e18).toFixed(0), 18),
-      18,
-    );
+    const apyBN = utils.parseUnits(utils.formatUnits((((weeklyROI + 1) ** 52 - 1) * 1e18).toFixed(0), 18), 18);
 
     return apyBN;
   }

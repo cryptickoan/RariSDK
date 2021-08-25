@@ -1,24 +1,25 @@
 {
   "name": "rari-sdk-sharad",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Rari Capital SDK",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json -w",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "preversion": "npm run lint",
     "test": "echo \"Error: no test specified\" && exit 1",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
-    "run-example": "cd ./examples/next && npm i && npm run dev"
+    "example": "cd ./examples/next && npm i && npm run dev"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^16.6.1",
+    "prettier": "^2.3.2",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.5"

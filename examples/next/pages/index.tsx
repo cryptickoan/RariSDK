@@ -14,7 +14,7 @@ export default function Home() {
     const rari = new Rari(turboGethURL);
     setRari(rari);
     rari.getEthUsdPriceBN().then((price) => console.log(parseFloat(price.toString()) / 1e18));
-    console.log({ rari });
+    rari.getAllTokens().then(console.log);
   }, []);
 
   return (
