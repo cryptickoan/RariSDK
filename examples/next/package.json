@@ -8,7 +8,7 @@
     "build": "npm run buildPackage && next build",
     "start": "npm run buildPackage && next start",
     "lint": "next lint",
-    "buildPackage" : "cd ../.. && npm run build"
+    "buildPackage": "cd ../.. && npm run build"
   },
   "dependencies": {
     "@next/bundle-analyzer": "^11.1.0",
@@ -17,6 +17,7 @@
     "react-dom": "17.0.2"
   },
   "devDependencies": {
+    "@types/react": "^17.0.19",
     "eslint": "7.32.0",
     "eslint-config-next": "11.1.0"
   }

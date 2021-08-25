@@ -8,17 +8,14 @@ import { useEffect, useState } from "react";
 export const turboGethURL = `https://turbogeth.crows.sh`;
 
 export default function Home() {
-  const [rari, setRari] = useState(null);
+  const [rari, setRari] = useState<Rari>(null);
 
   useEffect(() => {
     const rari = new Rari(turboGethURL);
     setRari(rari);
-    rari
-      .getEthUsdPriceBN()
-      .then((price) => console.log(parseFloat(price.toString()) / 1e18));
+    rari.getEthUsdPriceBN().then((price) => console.log(parseFloat(price.toString()) / 1e18));
+    console.log({ rari });
   }, []);
-
-  console.log({ rari });
 
   return (
     <div className={styles.container}>
@@ -34,8 +31,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{" "}
-          <code className={styles.code}>pages/index.js</code>
+          Get started by editing <code className={styles.code}>pages/index.js</code>
         </p>
 
         <div className={styles.grid}>
@@ -49,10 +45,7 @@ export default function Home() {
             <p>Learn about Next.js in an interactive course with quizzes!</p>
           </a>
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
+          <a href="https://github.com/vercel/next.js/tree/master/examples" className={styles.card}>
             <h2>Examples &rarr;</h2>
             <p>Discover and deploy boilerplate example Next.js projects.</p>
           </a>
@@ -62,9 +55,7 @@ export default function Home() {
             className={styles.card}
           >
             <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
+            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
           </a>
         </div>
       </main>
