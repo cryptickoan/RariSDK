@@ -4,19 +4,23 @@ import axios from "axios";
 // Ethers
 import { ethers } from "ethers";
 
-import Caches from "cache";
+import Caches from "../cache";
 
+// ABIs
 import erc20Abi from "../abi/ERC20.json";
+import MAsset from './mstable/abi/Masset.json';
+import MassetValidationHelper from './mstable/abi/MassetValidationHelper.json';
+
 
 const externalContractAddressesMStable = {
   Masset: "0xe2f2a5c287993345a840db3b0845fbc70f5935a5",
   MassetValidationHelper: "0xabcc93c3be238884cc3309c19afd128fafc16911",
 };
 
-const externalAbisMStable = {};
-for (const contractName of Object.keys(externalContractAddressesMStable)) {
-  externalAbisMStable[contractName] = require("./mstable/abi/" + contractName + ".json");
-}
+const externalAbisMStable = {
+    "Masset": MAsset,
+    "MassetValidationHelper": MassetValidationHelper
+};
 
 export default class mStableSubpool {
   provider;

@@ -1,8 +1,12 @@
 // Ethers
-import ethers from "ethers";
+import { Contract } from "ethers";
 
 // StablePool
 import StablePools from "./stable";
+
+// Legacy ABIs (v1.0.0)
+import RariFundControllerv100 from "./dai/abi/legacy/v1.0.0/RariFundController.json";
+import RariFundProxyABIv100 from "./dai/abi/legacy/v1.0.0/RariFundProxy.json";
 
 // Contract Addresses
 const contractAddressesDai = {
@@ -22,14 +26,12 @@ const legacyContractAddressesDai = {
 };
 
 // For every contractName require the ABI
-const legacyAbisDai = {};
-
-for (const version of Object.keys(legacyContractAddressesDai)) legacyAbisDai[version] = {};
-
-for (const version of Object.keys(legacyAbisDai))
-  for (const contractName of Object.keys(legacyContractAddressesDai[version]))
-    legacyAbisDai[version][contractName] = require("./dai/abi/legacy/" + version + "/" + contractName + ".json");
-
+const legacyAbisDai = {
+    "v1.0.0": {
+      RariFundController: RariFundControllerv100,
+      RariFundProxy: RariFundProxyABIv100,
+    },
+  };
 export default class DaiPool extends StablePools {
   API_BASE_URL = "https://api.rari.capital/pools/dai/";
   POOL_NAME = "Rari DAI Pool";
@@ -44,7 +46,7 @@ export default class DaiPool extends StablePools {
 
     this.contracts = {};
     for (const contractName of Object.keys(contractAddressesDai))
-      this.contracts[contractName] = new ethers.Contract(
+      this.contracts[contractName] = new Contract(
         contractAddressesDai[contractName],
         DaiPool.CONTRACT_ABIS[contractName],
         this.provider,
@@ -55,7 +57,7 @@ export default class DaiPool extends StablePools {
       if (!this.legacyContracts[version]) this.legacyContracts[version] = {};
 
       for (const contractName of Object.keys(legacyContractAddressesDai[version])) {
-        this.legacyContracts[version][contractName] = new ethers.Contract(
+        this.legacyContracts[version][contractName] = new Contract(
           legacyContractAddressesDai[version][contractName],
           legacyAbisDai[version][contractName],
           this.provider,

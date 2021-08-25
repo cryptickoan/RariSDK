@@ -2,10 +2,10 @@
 import axios from "axios";
 
 // Ethers
-import { ethers } from "ethers";
+import { Contract, getDefaultProvider, BigNumber, utils } from "ethers";
 
 // Cache
-import Caches from "cache";
+import Caches from "./cache";
 
 // Subpools
 import AaveSubpool from "./subpools/aave";
@@ -22,6 +22,7 @@ import DaiPool from "./pools/dai";
 
 // ERC20ABI
 import erc20Abi from "./abi/ERC20.json";
+
 export default class Rari {
   provider;
   cache;
@@ -32,11 +33,11 @@ export default class Rari {
   pools;
 
   constructor(web3Provider) {
-    this.provider = ethers.getDefaultProvider(web3Provider, "homestead");
+    this.provider = getDefaultProvider(web3Provider, "homestead");
     this.cache = new Caches({ allTokens: 8600, ethUSDPrice: 300 });
 
     for (const currencyCode of Object.keys(this.internalTokens))
-      this.internalTokens[currencyCode].contract = new ethers.Contract(
+      this.internalTokens[currencyCode].contract = new Contract(
         this.internalTokens[currencyCode].address,
         erc20Abi,
         this.provider,
@@ -51,13 +52,13 @@ export default class Rari {
       }
     };
 
-    this.getEthUsdPriceBN = async function () {
+    this.getEthUsdPriceBN = async function (): Promise<BigNumber> {
       return await self.cache.getOrUpdate("ethUSDPrice", async function () {
         try {
           const usdPrice = (
             await axios.get("https://api.coingecko.com/api/v3/simple/price?vs_currencies=usd&ids=ethereum")
           ).data.ethereum.usd;
-          const usdPriceBN = ethers.utils.parseUnits(usdPrice.toString(), "ether");
+          const usdPriceBN = utils.parseUnits(usdPrice.toString(), "ether");
           return usdPriceBN;
         } catch (error) {
           throw new Error("Error retrieving data from Coingecko API: " + error);
@@ -74,7 +75,7 @@ export default class Rari {
 
         for (const token of data.records)
           if (["DAI", "USDC", "USDT", "TUSD", "BUSD", "bUSD", "sUSD", "SUSD", "mUSD"].indexOf(token.symbol) < 0) {
-            token.contract = new ethers.Contract(token.address, erc20Abi);
+            token.contract = new Contract(token.address, erc20Abi);
             allTokens[token.symbol] = token;
           }
         return allTokens;

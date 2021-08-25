@@ -1,8 +1,43 @@
-import ethers from "ethers";
-import Caches from "cache";
+import { Contract, BigNumber, constants } from "ethers";
+import Caches from "../cache";
 import axios from "axios";
 
+// ABIs
 import erc20Abi from "../abi/ERC20.json";
+
+// Current ABIs
+import RariFundControllerABI from "./stable/abi/RariFundController.json";
+import RariFundManagerABI from "./stable/abi/RariFundManager.json";
+import RariFundTokenABI from "./stable/abi/RariFundToken.json";
+import RariFundPriceConsumerABI from "./stable/abi/RariFundPriceConsumer.json";
+import RariFundProxyABI from "./stable/abi/RariFundProxy.json";
+
+// Legacy ABIs (v1.0.0)
+import RariFundManagerABIv100 from "./stable/abi/legacy/v1.0.0/RariFundManager.json";
+import RariFundTokenABIv100 from "./stable/abi/legacy/v1.0.0/RariFundToken.json";
+import RariFundProxyABIv100 from "./stable/abi/legacy/v1.0.0/RariFundProxy.json";
+
+// Legacy ABIs (v1.1.0)
+import RariFundManagerABIv110 from "./stable/abi/legacy/v1.1.0/RariFundManager.json";
+import RariFundControllerABIv110 from "./stable/abi/legacy/v1.1.0/RariFundController.json";
+import RariFundProxyABIv110 from "./stable/abi/legacy/v1.1.0/RariFundProxy.json";
+
+// Legacy ABIs (v1.2.0)
+import RariFundProxyABIv120 from "./stable/abi/legacy/v1.2.0/RariFundProxy.json";
+
+// Legacy ABIs (v2.0.0)
+import RariFundManagerABIv200 from "./stable/abi/legacy/v2.0.0/RariFundManager.json";
+import RariFundControllerABIv200 from "./stable/abi/legacy/v2.0.0/RariFundController.json";
+import RariFundProxyABIv200 from "./stable/abi/legacy/v2.0.0/RariFundProxy.json";
+
+// Legacy ABIs (v2.2.0)
+import RariFundProxyABIv220 from "./stable/abi/legacy/v2.2.0/RariFundProxy.json";
+
+// Legacy ABIs (v2.4.0)
+import RariFundProxyABIv240 from "./stable/abi/legacy/v2.4.0/RariFundProxy.json";
+
+// Legacy ABIs (v2.5.0)
+import RariFundControllerABIv250 from "./stable/abi/legacy/v2.5.0/RariFundController.json";
 
 // Contract addresses
 const contractAddressesStable = {
@@ -13,10 +48,13 @@ const contractAddressesStable = {
   RariFundProxy: "0x4a785fa6fcd2e0845a24847beb7bddd26f996d4d",
 };
 
-// For every contractName require the ABI
-let abisStable = {};
-for (const contractName of Object.keys(contractAddressesStable))
-  abisStable[contractName] = require("./stable/abi/" + contractName + ".json");
+const abisStable = {
+  RariFundController: RariFundControllerABI,
+  RariFundManager: RariFundManagerABI,
+  RariFundToken: RariFundTokenABI,
+  RariFundPriceConsumer: RariFundPriceConsumerABI,
+  RariFundProxy: RariFundProxyABI,
+};
 
 // Legacy addresses
 const legacyContractAddresses = {
@@ -49,12 +87,38 @@ const legacyContractAddresses = {
   },
 };
 
-let legacyAbis = {};
-for (const version of Object.keys(legacyContractAddresses)) legacyAbis[version] = {};
+// Legacy addresses
+const legacyAbis = {
+  "v1.0.0": {
+    RariFundManager: RariFundManagerABIv100,
+    RariFundToken: RariFundTokenABIv100,
+    RariFundProxy: RariFundProxyABIv100,
+  },
+  "v1.1.0": {
+    RariFundController: RariFundControllerABIv110,
+    RariFundManager: RariFundManagerABIv110,
+    RariFundProxy: RariFundProxyABIv110,
+  },
+  "v1.2.0": {
+    RariFundProxy: RariFundProxyABIv120,
+  },
+  "v2.0.0": {
+    RariFundController: RariFundControllerABIv200,
+    RariFundManager: RariFundManagerABIv200,
+    RariFundProxy: RariFundProxyABIv200,
+  },
+  "v2.2.0": {
+    RariFundProxy: RariFundProxyABIv220,
+  },
+  "v2.4.0": {
+    RariFundProxy: RariFundProxyABIv240,
+  },
+  "v2.5.0": {
+    RariFundController: RariFundControllerABIv250,
+  },
+};
 
-for (const version of Object.keys(legacyAbis))
-  for (const contractName of Object.keys(legacyContractAddresses[version]))
-    legacyAbis[version][contractName] = require("./stable/abi/legacy/" + version + "/" + contractName + ".json");
+console.log({ legacyAbis, abisStable });
 
 export default class StablePool {
   API_BASE_URL = "https://api.rari.capital/pools/stable/";
@@ -88,7 +152,7 @@ export default class StablePool {
 
     this.contracts = {};
     for (const contractName of Object.keys(contractAddressesStable))
-      this.contracts[contractName] = new ethers.Contract(
+      this.contracts[contractName] = new Contract(
         contractAddressesStable[contractName],
         abisStable[contractName],
         this.provider,
@@ -98,7 +162,7 @@ export default class StablePool {
     for (const version of Object.keys(legacyContractAddresses)) {
       if (!this.legacyContracts[version]) this.legacyContracts[version] = {};
       for (const contractName of Object.keys(legacyContractAddresses[version]))
-        this.legacyContracts[version][contractName] = new ethers.Contract(
+        this.legacyContracts[version][contractName] = new Contract(
           legacyContractAddresses[version][contractName],
           legacyAbis[version][contractName],
           this.provider,
@@ -106,7 +170,7 @@ export default class StablePool {
     }
 
     for (const currencyCode of Object.keys(this.internalTokens))
-      this.internalTokens[currencyCode].contract = new ethers.Contract(
+      this.internalTokens[currencyCode].contract = new Contract(
         this.internalTokens[currencyCode].address,
         erc20Abi,
         this.provider,
@@ -150,11 +214,11 @@ export default class StablePool {
       },
       transfer: async (recipient, amount, options) => {
         if (!recipient) throw new Error("No recipient specified.");
-        if (!amount || !ethers.BigNumber.from(amount) || !amount.gt(ethers.constants.Zero))
+        if (!amount || !BigNumber.from(amount) || !amount.gt(constants.Zero))
           throw new Error("Amount is not a valid BN instance greater than 0.");
 
-        let fundBalanceBN = ethers.BigNumber.from(await self.contracts.RariFundManager.callStatic.getFundBalance());
-        let rftTotalSupplyBN = ethers.BigNumber.from(await self.contracts.RariFundToken.callStatic.totalSupply());
+        let fundBalanceBN = BigNumber.from(await self.contracts.RariFundManager.callStatic.getFundBalance());
+        let rftTotalSupplyBN = BigNumber.from(await self.contracts.RariFundToken.callStatic.totalSupply());
         let rftAmountBN = amount.mul(rftTotalSupplyBN).div(fundBalanceBN);
         return await self.contracts.RariFundToken.transfer(recipient, rftAmountBN).send(options);
       },
@@ -217,13 +281,13 @@ export default class StablePool {
       },
       getRawCurrencyAllocations: async () => {
         let allocationsByCurrency = {
-          DAI: ethers.constants.Zero,
-          USDC: ethers.constants.Zero,
-          USDT: ethers.constants.Zero,
-          TUSD: ethers.constants.Zero,
-          BUSD: ethers.constants.Zero,
-          sUSD: ethers.constants.Zero,
-          mUSD: ethers.constants.Zero,
+          DAI: constants.Zero,
+          USDC: constants.Zero,
+          USDT: constants.Zero,
+          TUSD: constants.Zero,
+          BUSD: constants.Zero,
+          sUSD: constants.Zero,
+          mUSD: constants.Zero,
         };
         let allBalances = await self.cache.getOrUpdate(
           "allBalances",
@@ -232,13 +296,13 @@ export default class StablePool {
 
         for (let i = 0; i < allBalances["0"].length; i++) {
           const currencyCode = allBalances["0"][i];
-          const contractBalanceBN = ethers.BigNumber.from(allBalances["1"][i]);
+          const contractBalanceBN = BigNumber.from(allBalances["1"][i]);
           allocationsByCurrency[currencyCode] = contractBalanceBN;
           const pools = allBalances["2"][i];
           const poolBalances = allBalances["3"][i];
 
           for (let j = 0; j < pools.length; j++) {
-            const poolBalanceBN = ethers.BigNumber.from(poolBalances[j]);
+            const poolBalanceBN = BigNumber.from(poolBalances[j]);
             allocationsByCurrency[currencyCode] = allocationsByCurrency[currencyCode].add(poolBalanceBN);
           }
         }
@@ -246,13 +310,13 @@ export default class StablePool {
       },
       getRawCurrencyAllocationsInUsd: async () => {
         const allocationsByCurrency = {
-          DAI: ethers.constants.Zero,
-          USDC: ethers.constants.Zero,
-          USDT: ethers.constants.Zero,
-          TUSD: ethers.constants.Zero,
-          BUSD: ethers.constants.Zero,
-          sUSD: ethers.constants.Zero,
-          mUSD: ethers.constants.Zero,
+          DAI: constants.Zero,
+          USDC: constants.Zero,
+          USDT: constants.Zero,
+          TUSD: constants.Zero,
+          BUSD: constants.Zero,
+          sUSD: constants.Zero,
+          mUSD: constants.Zero,
         };
         const allBalances = await self.cache.getOrUpdate(
           "allBalances",
@@ -261,14 +325,14 @@ export default class StablePool {
 
         for (let i = 0; i < allBalances["0"].length; i++) {
           const currencyCode = allBalances["0"][i];
-          const priceInUsdBN = ethers.BigNumber.from(allBalances["4"][i]);
-          const contractBalanceBN = ethers.BigNumber.from(allBalances["1"][i]);
+          const priceInUsdBN = BigNumber.from(allBalances["4"][i]);
+          const contractBalanceBN = BigNumber.from(allBalances["1"][i]);
           const contractBalanceUsdBN = contractBalanceBN
             .mul(priceInUsdBN)
             .div(
               self.internalTokens[currencyCode].decimals === 18
-                ? ethers.constants.WeiPerEther
-                : ethers.BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
+                ? constants.WeiPerEther
+                : BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
             );
           allocationsByCurrency[currencyCode] = contractBalanceUsdBN;
 
@@ -276,13 +340,13 @@ export default class StablePool {
           const poolBalances = allBalances["3"][i];
 
           for (let j = 0; j < pools.length; j++) {
-            const poolBalanceBN = ethers.BigNumber.from(poolBalances[j]);
+            const poolBalanceBN = BigNumber.from(poolBalances[j]);
             const poolBalanceUsdBN = poolBalanceBN
               .mul(priceInUsdBN)
               .div(
                 self.internalTokens[currencyCode].decimals === 18
-                  ? ethers.constants.WeiPerEther
-                  : ethers.BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
+                  ? constants.WeiPerEther
+                  : BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
               );
             allocationsByCurrency[currencyCode] = allocationsByCurrency[currencyCode].add(poolBalanceUsdBN);
           }
@@ -292,10 +356,10 @@ export default class StablePool {
       },
       getRawPoolAllocations: async () => {
         const allocationsByPool = {
-          _cash: ethers.constants.Zero,
+          _cash: constants.Zero,
         };
         for (const poolName of self.allocations.POOLS)
-          if (poolName !== undefined) allocationsByPool[poolName] = ethers.constants.Zero;
+          if (poolName !== undefined) allocationsByPool[poolName] = constants.Zero;
         const allBalances = await self.cache.getOrUpdate(
           "allBalances",
           self.contracts.RariFundProxy.callStatic.getRawFundBalancesAndPrices,
@@ -303,14 +367,14 @@ export default class StablePool {
 
         for (let i = 0; i < allBalances["0"].length; i++) {
           const currencyCode = allBalances["0"][i];
-          const priceInUsdBN = ethers.BigNumber.from(allBalances["4"][i]);
-          const contractBalanceBN = ethers.BigNumber.from(allBalances["1"][i]);
+          const priceInUsdBN = BigNumber.from(allBalances["4"][i]);
+          const contractBalanceBN = BigNumber.from(allBalances["1"][i]);
           const contractBalanceUsdBN = contractBalanceBN
             .mul(priceInUsdBN)
             .div(
               self.internalTokens[currencyCode].decimals === 18
-                ? ethers.constants.WeiPerEther
-                : ethers.BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
+                ? constants.WeiPerEther
+                : BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
             );
           allocationsByPool._cash = allocationsByPool._cash.add(contractBalanceUsdBN);
           const pools = allBalances["2"][i];
@@ -318,13 +382,13 @@ export default class StablePool {
 
           for (let j = 0; j < pools.length; j++) {
             const pool = pools[j];
-            const poolBalanceBN = ethers.BigNumber.from(poolBalances[j]);
+            const poolBalanceBN = BigNumber.from(poolBalances[j]);
             const poolBalanceUsdBN = poolBalanceBN
               .mul(priceInUsdBN)
               .div(
                 self.internalTokens[currencyCode].decimals === 18
-                  ? ethers.constants.WeiPerEther
-                  : ethers.BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
+                  ? constants.WeiPerEther
+                  : BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
               );
             allocationsByPool[self.allocations.POOLS[pool]] =
               allocationsByPool[self.allocations.POOLS[pool]].add(poolBalanceUsdBN);
@@ -341,14 +405,14 @@ export default class StablePool {
 
         for (let i = 0; i < allBalances["0"].length; i++) {
           const currencyCode = allBalances["0"][i];
-          const contractBalanceBN = ethers.BigNumber.from(allBalances["1"][i]);
+          const contractBalanceBN = BigNumber.from(allBalances["1"][i]);
           currencies[currencyCode] = { _cash: contractBalanceBN };
           const pools = allBalances["2"][i];
           const poolBalances = allBalances["3"][i];
 
           for (let j = 0; j < pools.length; j++) {
             const pool = pools[j];
-            const poolBalanceBN = ethers.BigNumber.from(poolBalances[j]);
+            const poolBalanceBN = BigNumber.from(poolBalances[j]);
             currencies[currencyCode][self.allocations.POOLS[pool]] = poolBalanceBN;
           }
         }
@@ -361,7 +425,7 @@ export default class StablePool {
           self.contracts.RariFundProxy.callStatic.getRawFundBalancesAndPrices,
         );
         for (let i = 0; i < allBalances["0"].length; i++) {
-          prices[allBalances["0"][i]] = ethers.BigNumber.from(allBalances["4"][i]);
+          prices[allBalances["0"][i]] = BigNumber.from(allBalances["4"][i]);
         }
         return prices;
       },
@@ -370,7 +434,7 @@ export default class StablePool {
     this.apy = {
       getCurrentRawApy: async () => {
         let factors = [];
-        let totalBalanceUsdBN = ethers.constants.Zero;
+        let totalBalanceUsdBN = constants.Zero;
 
         // Get all Balances
         const allBalances = await self.cache.getOrUpdate(
@@ -381,36 +445,36 @@ export default class StablePool {
         // Get raw balance
         for (let i = 0; i < allBalances["0"].length; i++) {
           const currencyCode = allBalances["0"][i];
-          const priceInUsdBN = ethers.BigNumber.from(allBalances["4"][i]);
-          const contractBalanceBN = ethers.BigNumber.from(allBalances["1"][i]);
+          const priceInUsdBN = BigNumber.from(allBalances["4"][i]);
+          const contractBalanceBN = BigNumber.from(allBalances["1"][i]);
 
           const contractBalanceUsdBN = contractBalanceBN
             .mul(priceInUsdBN)
             .div(
               self.internalTokens[currencyCode].decimals === 18
-                ? ethers.constants.WeiPerEther
-                : ethers.BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
+                ? constants.WeiPerEther
+                : BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
             );
 
-          factors.push([contractBalanceUsdBN, ethers.constants.Zero]);
+          factors.push([contractBalanceUsdBN, constants.Zero]);
           totalBalanceUsdBN = totalBalanceUsdBN.add(contractBalanceUsdBN);
           const pools = allBalances["2"][i];
           const poolBalances = allBalances["3"][i];
 
           for (let j = 0; j < pools.length; j++) {
             const pool = pools[j];
-            const poolBalanceBN = ethers.BigNumber.from(poolBalances[j]);
+            const poolBalanceBN = BigNumber.from(poolBalances[j]);
             const poolBalanceUsdBN = poolBalanceBN
               .mul(priceInUsdBN)
               .div(
                 self.internalTokens[currencyCode].decimals === 18
-                  ? ethers.constants.WeiPerEther
-                  : ethers.BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
+                  ? constants.WeiPerEther
+                  : BigNumber.from(10 ** self.internalTokens[currencyCode].decimals),
               );
 
-            const poolApyBN = poolBalanceUsdBN.gt(ethers.constants.Zero)
+            const poolApyBN = poolBalanceUsdBN.gt(constants.Zero)
               ? (await self.pools[self.allocations.POOLS[pool]].getCurrencyApys())[currencyCode]
-              : ethers.constants.Zero;
+              : constants.Zero;
 
             factors.push([poolBalanceUsdBN, poolApyBN]);
             totalBalanceUsdBN = totalBalanceUsdBN.add(poolBalanceUsdBN);
@@ -419,19 +483,17 @@ export default class StablePool {
 
         console.log(totalBalanceUsdBN.isZero());
         if (totalBalanceUsdBN.isZero()) {
-          let maxApyBN = ethers.constants.Zero;
+          let maxApyBN = constants.Zero;
           for (let i = 0; i < factors.length; i++) {
             if (factors[i][1].gt(maxApyBN)) maxApyBN = factors[i][1];
           }
           return maxApyBN;
         }
 
-        let apyBN = ethers.constants.Zero;
+        let apyBN = constants.Zero;
         for (let i = 0; i < factors.length; i++) {
           apyBN = apyBN.add(
-            factors[i][0]
-              .mul(factors[i][1].gt(ethers.constants.Zero) ? factors[i][1] : ethers.constants.Zero)
-              .div(totalBalanceUsdBN),
+            factors[i][0].mul(factors[i][1].gt(constants.Zero) ? factors[i][1] : constants.Zero).div(totalBalanceUsdBN),
           );
         }
         return apyBN;
