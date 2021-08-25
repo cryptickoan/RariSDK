@@ -1,0 +1,24 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "analyze": "ANALYZE=true npm run build",
+    "dev": "npm run buildPackage && next dev",
+    "build": "npm run buildPackage && next build",
+    "start": "npm run buildPackage && next start",
+    "lint": "next lint",
+    "buildPackage": "cd ../.. && npm run build"
+  },
+  "dependencies": {
+    "@next/bundle-analyzer": "^11.1.0",
+    "next": "11.1.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.19",
+    "eslint": "7.32.0",
+    "eslint-config-next": "11.1.0"
+  }
+}

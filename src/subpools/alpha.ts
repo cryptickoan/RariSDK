@@ -1,49 +1,58 @@
-var ethers = require('ethers')
-var Caches = require('../cache.ts')
+import { Contract } from "ethers";
+import Caches from "../cache";
 
-var externalContractAddressesAlpha = {
-    Bank: "0x67B66C99D3Eb37Fa76Aa3Ed1ff33E8e39F0b9c7A",
-    ConfigurableInterestBankConfig: "0x97a49f8eec63c0dfeb9db4c791229477962dc692",
-  };
+// ABIs
+import BankABI from "./alpha/abi/Bank.json";
+import ConfigurableInterestBankConfig from "./alpha/abi/ConfigurableInterestBankConfig.json";
 
-var externalAbisAlpha = {};
-for (const contractName of Object.keys(externalContractAddressesAlpha)) {
-    externalAbisAlpha[contractName] = require('./alpha/abi/' + contractName + '.json')
-}
+const externalContractAddressesAlpha = {
+  Bank: "0x67B66C99D3Eb37Fa76Aa3Ed1ff33E8e39F0b9c7A",
+  ConfigurableInterestBankConfig: "0x97a49f8eec63c0dfeb9db4c791229477962dc692",
+};
 
-module.exports = class AlphaSubpool {
-    provider
-    cache
-    externalContracts
+const externalAbisAlpha = {
+  Bank: BankABI,
+  ConfigurableInterestBankConfig: ConfigurableInterestBankConfig,
+};
 
-    constructor(provider) {
-        this.provider = provider;
-        this.cache = new Caches({
-            alphaIBEthApy: 300,
-        })
+export default class AlphaSubpool {
+  provider;
+  cache;
+  externalContracts;
 
-        this.externalContracts = {};
-        for (const contractName of Object.keys(externalContractAddressesAlpha)) {
-            this.externalContracts[contractName] = new ethers.Contract(externalContractAddressesAlpha[contractName], externalAbisAlpha[contractName], this.provider);
-        }
+  constructor(provider) {
+    this.provider = provider;
+    this.cache = new Caches({
+      alphaIBEthApy: 300,
+    });
+
+    this.externalContracts = {};
+    for (const contractName of Object.keys(externalContractAddressesAlpha)) {
+      this.externalContracts[contractName] = new Contract(
+        externalContractAddressesAlpha[contractName],
+        externalAbisAlpha[contractName],
+        this.provider,
+      );
     }
+  }
 
-    async getCurrencyApys() {
-        return { ETH: await this.getIBEthApyBN() };
-    }
+  async getCurrencyApys() {
+    return { ETH: await this.getIBEthApyBN() };
+  }
 
-    async getIBEthApyBN () {
-        var self = this;
-        return await this.cache.getOrUpdate("alphaIBEthApy", async function() {
-            try {
-                const glbDebtVal = await self.externalContracts.Bank.glbDebtVal()
-                const balance = await self.provider.getBalance(self.externalContracts.Bank.address)
-                // as this is no longer being used I'll leave it as is
-                const interestRatePerSecondBN = await self.externalContracts.ConfigurableInterestBankConfig.callStatic.getInterestRate(glbDebtVal, balance)
-                return balance
-            } catch(e) {
-                throw new Error("Failed to get Alpha Homora V1 interest rate: " + e);
-            }
-        })
-    }
+  async getIBEthApyBN() {
+    let self = this;
+    return await this.cache.getOrUpdate("alphaIBEthApy", async function () {
+      try {
+        const glbDebtVal = await self.externalContracts.Bank.glbDebtVal();
+        const balance = await self.provider.getBalance(self.externalContracts.Bank.address);
+        // as this is no longer being used I'll leave it as is
+        const interestRatePerSecondBN =
+          await self.externalContracts.ConfigurableInterestBankConfig.callStatic.getInterestRate(glbDebtVal, balance);
+        return balance;
+      } catch (e) {
+        throw new Error("Failed to get Alpha Homora V1 interest rate: " + e);
+      }
+    });
+  }
 }

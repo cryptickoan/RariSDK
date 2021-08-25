@@ -1,1 +1,6 @@
-/node_modules
+node_modules
+/dist
+
+# Examples
+examples/**/.next
+examples/**/node_modules

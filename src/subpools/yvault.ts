@@ -1,18 +1,18 @@
-var ethers = require('ethers')
+import { constants } from "ethers";
 
-module.exports = class YVault {
-    provider
+export default class YVault {
+  provider;
 
-    constructor(provider) {
-        this.provider = provider
-    }
+  constructor(provider) {
+    this.provider = provider;
+  }
 
-    getCurrencyApys() {
-        return {
-            DAI: ethers.constants.Zero,
-            USDC: ethers.constants.Zero,
-            USDT:  ethers.constants.Zero,
-            TUSD:  ethers.constants.Zero,
-        }
-    }
+  getCurrencyApys() {
+    return {
+      DAI: constants.Zero,
+      USDC: constants.Zero,
+      USDT: constants.Zero,
+      TUSD: constants.Zero,
+    };
+  }
 }
