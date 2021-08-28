@@ -43,6 +43,8 @@ export default class mStableSubpool {
     }
   }
 
+  static SUPPORTED_EXCHANGE_CURRENCIES = ["USDC", "USDT", "TUSD"];
+
   async getMUsdSavingsApy(includeIMUsdVaultApy) {
     const data = (
       await axios.post("https://api.thegraph.com/subgraphs/name/mstable/mstable-protocol-staging", {

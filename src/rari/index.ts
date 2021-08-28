@@ -22,12 +22,23 @@ import DaiPool from "./pools/dai";
 
 // ERC20ABI
 import erc20Abi from "./abi/ERC20.json";
+
+export interface GetAllTokensReturn {
+  [tokenSymbol: string]: {
+    symbol: string;
+    address: string;
+    name: string;
+    decimals: number;
+    contract: any;
+  };
+}
+
 export default class Rari {
   provider;
   cache;
   price;
   getEthUsdPriceBN;
-  getAllTokens;
+  getAllTokens: () => Promise<GetAllTokensReturn>;
   subpools;
   pools;
 
@@ -65,7 +76,7 @@ export default class Rari {
       });
     };
 
-    this.getAllTokens = async function (cacheTimeout = 86400) {
+    this.getAllTokens = async function (cacheTimeout = 86400): Promise<GetAllTokensReturn> {
       self.cache._raw["allTokens"].timeout = typeof cacheTimeout === "undefined" ? 86400 : cacheTimeout;
       return await self.cache.getOrUpdate("allTokens", async function () {
         let allTokens = Object.assign({}, self.internalTokens);
@@ -74,7 +85,7 @@ export default class Rari {
 
         for (const token of data.records)
           if (["DAI", "USDC", "USDT", "TUSD", "BUSD", "bUSD", "sUSD", "SUSD", "mUSD"].indexOf(token.symbol) < 0) {
-            token.contract = new Contract(token.address, erc20Abi);
+            token.contract = new Contract(token.address, erc20Abi, self.provider);
             allTokens[token.symbol] = token;
           }
         return allTokens;
