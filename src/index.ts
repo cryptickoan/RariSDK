@@ -1,1 +1,2 @@
-export * from "./rari";
+import Rari from "./rari";
+export { Rari };
