@@ -7,6 +7,7 @@ import axios from 'axios';
 // ABIs
 import fusePoolDirectoryAbi from './abi/FusepoolDirectory.json';
 import fusePoolLensAbi from './abi/FusePoolLens.json';
+import fusePoolLensSecondaryAbi from './abi/FusePoolLensSecondary.json';
 import fuseSafeLiquidatorAbi from './abi/FuseSafeLiquidator.json';
 import fuseFeeDistributorAbi from './abi/FuseFeeDistributor.json';
 
